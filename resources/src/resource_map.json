@@ -1,0 +1,30 @@
+{
+    "friendlyVersion": "VERSION",
+    "versionDefName": "APP_RESOURCES",
+    "media": 
+    [
+        {
+            "type": "font",
+            "characterRegex": "[0-9. ]",
+            "defName": "FONT_DEJAVU_SANS_BOLD_SUBSET_36",
+            "file": "fonts/DejaVuSans-Bold.ttf"
+        },
+        
+        {
+            "type": "png",
+            "defName": "IMAGE_BG",
+            "file": "images/Foot.png"
+        },
+        
+        {
+            "type": "png",
+            "defName": "IMAGE_MENU_ICON",
+            "file": "images/Scorekeeper.png"
+        },
+        {
+            "type": "png",
+            "defName": "IMAGE_BUTTON_LABELS",
+            "file": "images/buttons.png"
+        }
+    ]
+}
