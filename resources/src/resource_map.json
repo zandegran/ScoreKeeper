@@ -25,6 +25,11 @@
             "type": "png",
             "defName": "IMAGE_BUTTON_LABELS",
             "file": "images/buttons.png"
+        },
+        {
+            "type": "png",
+            "defName": "IMAGE_BUTTON_LABELS_NO_VIBE",
+            "file": "images/buttons_novibe.png"
         }
     ]
 }

@@ -28,7 +28,7 @@
 #define MY_UUID { 0xC2, 0x5A, 0x8D, 0x50, 0x10, 0x5F, 0x45, 0xBF, 0xC9, 0x92, 0xCE, 0xF9, 0x58, 0xAC, 0x93, 0xAD }
 PBL_APP_INFO(MY_UUID,
              "Score Keeper", "zandegran",
-             1, 1, /* App version */
+             1, 2, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_STANDARD_APP);
 
@@ -55,6 +55,7 @@ static BmpContainer Background;
 // Actually keeping track of time
 static int clicksa=0;
 static int clicksb=0;
+static bool vibe=true;
 static AppTimerHandle  update_timer = APP_TIMER_INVALID_HANDLE;
 // We want hundredths of a second, but Pebble won't give us that.
 // Pebble's timers are also too inaccurate (we run fast for some reason)
@@ -76,7 +77,21 @@ void config_provider(ClickConfig **config, Window *window);
 void handle_init(AppContextRef ctx);
 void handle_timer(AppContextRef ctx, AppTimerHandle handle, uint32_t cookie);
 void pbl_main(void *params);
-
+void update_vibe_icon()
+{
+    layer_remove_from_parent(&button_labels.layer.layer);
+    bmp_deinit_container(&button_labels);
+    if (vibe)
+    {
+        bmp_init_container(RESOURCE_ID_IMAGE_BUTTON_LABELS, &button_labels);
+    }
+    else
+    {
+        bmp_init_container(RESOURCE_ID_IMAGE_BUTTON_LABELS_NO_VIBE, &button_labels);
+    }
+    layer_set_frame(&button_labels.layer.layer, GRect(130, 0, 14, 140));
+    layer_add_child(&window.layer, &button_labels.layer.layer);
+}
 void handle_init(AppContextRef ctx) {
     app = ctx;
 
@@ -100,14 +115,14 @@ void handle_init(AppContextRef ctx) {
     layer_set_frame(&Background.layer.layer, GRect(0, 0, 144, 140));
     layer_add_child(root_layer, &Background.layer.layer);
     // Set up the Score.
-    text_layer_init(&ScoreA_layer, GRect(25, 20, 90, 40));
+    text_layer_init(&ScoreA_layer, GRect(25, 18, 90, 40));
     text_layer_set_background_color(&ScoreA_layer, GColorBlack);
     text_layer_set_font(&ScoreA_layer, big_font);
     text_layer_set_text_color(&ScoreA_layer, GColorWhite);
     text_layer_set_text(&ScoreA_layer, " 0 ");
     text_layer_set_text_alignment(&ScoreA_layer, GTextAlignmentCenter);
     layer_add_child(root_layer, &ScoreA_layer.layer);
-    text_layer_init(&ScoreB_layer, GRect(25, 82, 90, 40));
+    text_layer_init(&ScoreB_layer, GRect(25, 81, 90, 40));
     text_layer_set_background_color(&ScoreB_layer, GColorBlack);
     text_layer_set_font(&ScoreB_layer, big_font);
     text_layer_set_text_color(&ScoreB_layer, GColorWhite);
@@ -118,9 +133,7 @@ void handle_init(AppContextRef ctx) {
  
 
     // Add some button labels
-    bmp_init_container(RESOURCE_ID_IMAGE_BUTTON_LABELS, &button_labels);
-    layer_set_frame(&button_labels.layer.layer, GRect(130, 0, 14, 140));
-    layer_add_child(root_layer, &button_labels.layer.layer);
+    update_vibe_icon();
 
     
 }
@@ -129,34 +142,61 @@ void handle_deinit(AppContextRef ctx) {
     bmp_deinit_container(&button_labels);
 }
 
-
+void vibe_handler(ClickRecognizerRef recognizer, Window *window) {
+    if(vibe)
+    {
+        vibes_short_pulse();
+        vibe=false;
+        
+    }
+    else
+    {
+        vibe=true;
+    }
+    update_vibe_icon();
+}
 void reset_handler(ClickRecognizerRef recognizer, Window *window) {
     clicksa=0;
     clicksb=0;
+    if(vibe)
+        vibes_long_pulse();
     update_timer = app_timer_send_event(app, 100, TIMER_UPDATE);
 }
 
 void Aincrement_handler(ClickRecognizerRef recognizer, Window *window) {
     
     clicksa+=1;
+    if(vibe)
+        vibes_short_pulse();
     update_timer = app_timer_send_event(app, 100, TIMER_UPDATE);
 }
 
 void Adecrement_handler(ClickRecognizerRef recognizer, Window *window) {
     if(clicksa>0)
+    {
         clicksa-=1;
-    update_timer = app_timer_send_event(app, 100, TIMER_UPDATE);
+        if(vibe)
+            vibes_short_pulse();
+        update_timer = app_timer_send_event(app, 100, TIMER_UPDATE);
+    }
+    
 }
 void Bincrement_handler(ClickRecognizerRef recognizer, Window *window) {
     
     clicksb+=1;
+    if(vibe)
+        vibes_short_pulse();
     update_timer = app_timer_send_event(app, 100, TIMER_UPDATE);
 }
 
 void Bdecrement_handler(ClickRecognizerRef recognizer, Window *window) {
     if(clicksb>0)
+    {
         clicksb-=1;
-    update_timer = app_timer_send_event(app, 100, TIMER_UPDATE);
+        if(vibe)
+            vibes_short_pulse();
+        update_timer = app_timer_send_event(app, 100, TIMER_UPDATE);
+    }
 }
 void itoa2(int num, char* buffer) {
     const char digits[10] = "0123456789";
@@ -218,6 +258,7 @@ void config_provider(ClickConfig **config, Window *window) {
     config[BUTTON_DOWN]->click.handler = (ClickHandler)Bincrement_handler;
     config[BUTTON_DOWN]->long_click.handler = (ClickHandler)Bdecrement_handler;
     config[BUTTON_DOWN]->long_click.delay_ms = 700;
+    config[BUTTON_RESET]->click.handler = (ClickHandler)vibe_handler;
     config[BUTTON_RESET]->long_click.handler = (ClickHandler)reset_handler;
     config[BUTTON_RESET]->long_click.delay_ms = 1000;
     (void)window;
