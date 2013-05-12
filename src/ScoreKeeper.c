@@ -115,18 +115,18 @@ void handle_init(AppContextRef ctx) {
     layer_set_frame(&Background.layer.layer, GRect(0, 0, 144, 140));
     layer_add_child(root_layer, &Background.layer.layer);
     // Set up the Score.
-    text_layer_init(&ScoreA_layer, GRect(25, 18, 90, 40));
+    text_layer_init(&ScoreA_layer, GRect(20, 18, 90, 40));
     text_layer_set_background_color(&ScoreA_layer, GColorBlack);
     text_layer_set_font(&ScoreA_layer, big_font);
     text_layer_set_text_color(&ScoreA_layer, GColorWhite);
-    text_layer_set_text(&ScoreA_layer, " 0 ");
+    text_layer_set_text(&ScoreA_layer, "  0");
     text_layer_set_text_alignment(&ScoreA_layer, GTextAlignmentCenter);
     layer_add_child(root_layer, &ScoreA_layer.layer);
-    text_layer_init(&ScoreB_layer, GRect(25, 81, 90, 40));
+    text_layer_init(&ScoreB_layer, GRect(20, 81, 90, 40));
     text_layer_set_background_color(&ScoreB_layer, GColorBlack);
     text_layer_set_font(&ScoreB_layer, big_font);
     text_layer_set_text_color(&ScoreB_layer, GColorWhite);
-    text_layer_set_text(&ScoreB_layer, " 0 ");
+    text_layer_set_text(&ScoreB_layer, "  0");
     text_layer_set_text_alignment(&ScoreB_layer, GTextAlignmentCenter);
     layer_add_child(root_layer, &ScoreB_layer.layer);
 
